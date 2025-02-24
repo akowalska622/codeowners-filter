@@ -17,6 +17,10 @@
       {
         "command": "codeOwners.refresh",
         "title": "Refresh CODEOWNERS View"
+      },
+      {
+        "command": "codeOwners.selectOwner",
+        "title": "Select Code Owner"
       }
     ],
     "views": {
