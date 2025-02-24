@@ -32,7 +32,7 @@
       },
       {
         "command": "codeOwners.generateIncludePattern",
-        "title": "CODEOWNERS: Include pattern for selected Code Owner"
+        "title": "CODEOWNERS: Generate \"include\" pattern for selected Code Owner"
       }
     ],
     "views": {
