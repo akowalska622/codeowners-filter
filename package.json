@@ -1,7 +1,7 @@
 {
   "name": "codeowners-filter",
   "displayName": "CODEOWNERS Filter",
-  "description": "Filters files in the tree view based on the CODEOWNERS file.",
+  "description": "Filters files in the tree view and search based on the CODEOWNERS file.",
   "version": "0.0.1",
   "publisher": "Ania Kowalska",
   "engines": {
@@ -15,12 +15,24 @@
   "contributes": {
     "commands": [
       {
+        "command": "codeOwners.listCodeOwners",
+        "title": "CODEOWNERS: List Code Owners"
+      },
+      {
         "command": "codeOwners.refresh",
-        "title": "Refresh CODEOWNERS View"
+        "title": "CODEOWNERS: Refresh CODEOWNERS View"
       },
       {
         "command": "codeOwners.selectOwner",
-        "title": "Select Code Owner"
+        "title": "CODEOWNERS: Select Code owner"
+      },
+      {
+        "command": "codeOwners.toggleSearchFilter",
+        "title": "CODEOWNERS: Toggle search in owned files only"
+      },
+      {
+        "command": "codeOwners.generateIncludePattern",
+        "title": "CODEOWNERS: Include pattern for selected Code Owner"
       }
     ],
     "views": {
@@ -41,7 +53,8 @@
     "test": "vscode-test"
   },
   "dependencies": {
-    "minimatch": "^5.0.0"
+    "codeowners": "^5.1.1",
+    "minimatch": "^10.0.1"
   },
   "devDependencies": {
     "@types/minimatch": "^5.1.2",
