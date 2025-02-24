@@ -157,6 +157,13 @@ export const activate = (context: vscode.ExtensionContext): void => {
           vscode.window.showInformationMessage(
             `Generated pattern (paths for "${selectedOwner}") and copied it to clipboard: ${paths}`
           );
+
+          // Now trigger VSCode search with the generated include pattern
+          vscode.commands.executeCommand("workbench.action.findInFiles", {
+            query: "",
+            filesToInclude: paths, // Set the paths as the "include" filter
+            triggerSearch: true,
+          });
         }
       }
     );
