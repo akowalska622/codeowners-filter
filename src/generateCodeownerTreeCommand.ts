@@ -17,41 +17,52 @@ const createTreeItem = (
   node: PathNode,
   workspacePath: string
 ): vscode.TreeItem => {
+  const treeItem = new vscode.TreeItem(
+    node.label,
+    vscode.TreeItemCollapsibleState.None
+  );
+
+  // Handle special case for "selectCodeownerMessage" context value
+  if ((node as any).contextValue === "selectCodeownerMessage") {
+    treeItem.label = "Select a Codeowner to render a tree view";
+    treeItem.command = {
+      command: "codeOwners.generateCodeownerTree",
+      title: "Select Codeowner",
+      arguments: [],
+    };
+    return treeItem;
+  }
+
   const collapsibleState =
     node.children.length > 0
       ? vscode.TreeItemCollapsibleState.Collapsed
       : vscode.TreeItemCollapsibleState.None;
 
-  const treeItem = new vscode.TreeItem(node.label, collapsibleState);
-
-  // Set common properties
+  // Set tooltip and styling like before
   treeItem.tooltip = `${node.fullPath}${
     node.isDirectlyOwned ? " (directly owned)" : ""
   }`;
+  treeItem.collapsibleState = collapsibleState;
+  treeItem.contextValue = node.isFile
+    ? node.isDirectlyOwned
+      ? "ownedFile"
+      : "file"
+    : node.isDirectlyOwned
+    ? "ownedFolder"
+    : "folder";
 
-  // Set command to open file on click
+  // Handle files and directories
   if (node.isFile) {
     const filePath = path.join(workspacePath, node.fullPath);
+    treeItem.resourceUri = vscode.Uri.file(filePath);
     treeItem.command = {
       command: "vscode.open",
       arguments: [vscode.Uri.file(filePath)],
       title: "Open File",
     };
-  }
-
-  // Different styling for files vs directories and owned vs not owned
-  if (node.isFile) {
-    // Use resourceUri for correct file icons that inherit from theme
-    const filePath = path.join(workspacePath, node.fullPath);
-    treeItem.resourceUri = vscode.Uri.file(filePath);
-    treeItem.contextValue = node.isDirectlyOwned ? "ownedFile" : "file";
-    treeItem.description = node.isDirectlyOwned ? "(directly owned)" : "";
   } else {
-    // Use resourceUri for folders too to inherit theme
     const folderPath = path.join(workspacePath, node.fullPath);
     treeItem.resourceUri = vscode.Uri.file(folderPath);
-    treeItem.contextValue = node.isDirectlyOwned ? "ownedFolder" : "folder";
-    treeItem.description = node.isDirectlyOwned ? "(directly owned)" : "";
   }
 
   return treeItem;
@@ -268,7 +279,18 @@ const createCodeownerTreeDataProvider = () => {
 
     getChildren: (element?: vscode.TreeItem): Thenable<vscode.TreeItem[]> => {
       if (!currentCodeowner) {
-        return Promise.resolve([]);
+        // If no codeowner is selected, show a message and a button
+        const messageItem = new vscode.TreeItem(
+          "Select a Codeowner to render a tree view",
+          vscode.TreeItemCollapsibleState.None
+        );
+        messageItem.command = {
+          command: "codeOwners.generateCodeownerTree",
+          title: "Select Codeowner",
+          arguments: [],
+        };
+        messageItem.contextValue = "selectCodeownerMessage"; // You can style it differently if needed
+        return Promise.resolve([messageItem]);
       }
 
       if (!element) {
