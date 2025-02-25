@@ -13,33 +13,35 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "codeOwners.listCodeOwners",
-        "title": "CODEOWNERS: List Code Owners"
-      },
-      {
-        "command": "codeOwners.refresh",
-        "title": "CODEOWNERS: Refresh CODEOWNERS View"
-      },
-      {
-        "command": "codeOwners.selectOwner",
-        "title": "CODEOWNERS: Select Code owner"
-      },
-      {
-        "command": "codeOwners.toggleSearchFilter",
-        "title": "CODEOWNERS: Toggle search in owned files only"
-      },
-      {
-        "command": "codeOwners.generateIncludePattern",
-        "title": "CODEOWNERS: Generate \"include\" pattern for selected Code Owner"
-      }
-    ],
     "views": {
       "explorer": [
         {
-          "id": "codeOwnersView",
-          "name": "CODEOWNERS View"
+          "id": "codeOwnersExplorer",
+          "name": "Code Owners"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "codeOwners.listCodeOwners",
+        "title": "Code Owners: List and Copy Code Owner"
+      },
+      {
+        "command": "codeOwners.generateIncludePattern",
+        "title": "Code Owners: Generate Include Pattern and Search"
+      },
+      {
+        "command": "codeOwners.refreshTreeView",
+        "title": "Code Owners: Refresh Tree View",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "codeOwners.refreshTreeView",
+          "when": "view == codeOwnersExplorer",
+          "group": "navigation"
         }
       ]
     }
