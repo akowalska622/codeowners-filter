@@ -341,6 +341,16 @@ const updateTreeViewTitle = (codeowner: string) => {
 
 // Command to refresh the tree view
 const refreshTreeView = async () => {
+  const currentCodeowner = codeownerTreeProvider.getCurrentCodeowner();
+
+  if (currentCodeowner) {
+    // If a codeowner is already selected, just refresh it
+    codeownerTreeProvider.refresh(currentCodeowner);
+    updateTreeViewTitle(currentCodeowner);
+    return;
+  }
+
+  // Otherwise, prompt the user to select a codeowner
   const codeowners = getListOfUniqueCodeowners();
 
   if (codeowners.length === 0) {
@@ -357,16 +367,6 @@ const refreshTreeView = async () => {
   if (selectedCodeowner) {
     codeownerTreeProvider.refresh(selectedCodeowner);
     updateTreeViewTitle(selectedCodeowner);
-  }
-};
-
-// Command to open file in editor
-const openFileInEditor = async (uri: vscode.Uri) => {
-  try {
-    const document = await vscode.workspace.openTextDocument(uri);
-    await vscode.window.showTextDocument(document);
-  } catch (error) {
-    vscode.window.showErrorMessage(`Failed to open file: ${error}`);
   }
 };
 
@@ -396,40 +396,7 @@ export const registerCodeownerTreeCommand = (
     refreshTreeView
   );
 
-  const openFileCommand = vscode.commands.registerCommand(
-    "codeOwners.openFile",
-    (filePath: string) => {
-      if (!filePath) return;
-
-      const workspaceFolders = vscode.workspace.workspaceFolders;
-      if (!workspaceFolders) return;
-
-      const fullPath = path.join(workspaceFolders[0].uri.fsPath, filePath);
-      openFileInEditor(vscode.Uri.file(fullPath));
-    }
-  );
-
-  // Register command to edit file
-  const editFileCommand = vscode.commands.registerCommand(
-    "codeOwners.editFile",
-    (filePath: string) => {
-      if (!filePath) return;
-
-      const workspaceFolders = vscode.workspace.workspaceFolders;
-      if (!workspaceFolders) return;
-
-      const fullPath = path.join(workspaceFolders[0].uri.fsPath, filePath);
-      openFileInEditor(vscode.Uri.file(fullPath));
-    }
-  );
-
-  context.subscriptions.push(
-    selectCodeownerCommand,
-    refreshCommand,
-    openFileCommand,
-    editFileCommand,
-    treeView
-  );
+  context.subscriptions.push(selectCodeownerCommand, refreshCommand, treeView);
 };
 
 export const refreshCodeownerTree = (codeowner: string): void => {

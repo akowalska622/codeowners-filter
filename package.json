@@ -39,14 +39,6 @@
         "command": "codeOwners.refreshTreeView",
         "title": "Code Owners: Refresh Tree View",
         "icon": "$(refresh)"
-      },
-      {
-        "command": "codeOwners.openFile",
-        "title": "Open File"
-      },
-      {
-        "command": "codeOwners.editFile",
-        "title": "Edit File"
       }
     ],
     "menus": {
@@ -55,18 +47,11 @@
           "command": "codeOwners.generateCodeownerTree",
           "when": "view == kibanaCodeowners.codeownerTree",
           "group": "navigation@1"
-        }
-      ],
-      "view/item/context": [
-        {
-          "command": "codeOwners.openFile",
-          "when": "viewItem == ownedFile || viewItem == file",
-          "group": "inline"
         },
         {
-          "command": "codeOwners.editFile",
-          "when": "viewItem == ownedFile || viewItem == file",
-          "group": "1_modification"
+          "command": "codeOwners.refreshTreeView",
+          "when": "view == kibanaCodeowners.codeownerTree",
+          "group": "navigation@2"
         }
       ]
     }
