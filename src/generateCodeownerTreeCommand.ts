@@ -38,7 +38,7 @@ const createTreeItem = (
       ? vscode.TreeItemCollapsibleState.Collapsed
       : vscode.TreeItemCollapsibleState.None;
 
-  // Set tooltip and styling like before
+  // Set tooltip and styling
   treeItem.tooltip = `${node.fullPath}${
     node.isDirectlyOwned ? " (directly owned)" : ""
   }`;
@@ -140,6 +140,44 @@ const getFilesInDirectory = (
   }
 };
 
+// Determine the most specific codeowner for a path
+const getMostSpecificCodeowner = (
+  path: string,
+  codeownerPaths: Record<string, string[]>
+): string | null => {
+  let mostSpecificCodeowner: string | null = null;
+  let longestMatchLength = -1;
+
+  // Go through all codeowners and their paths
+  for (const [codeowner, paths] of Object.entries(codeownerPaths)) {
+    for (const pattern of paths) {
+      // Skip if the pattern contains wildcards - we'll handle those separately
+      if (pattern.includes("*")) {
+        continue;
+      }
+
+      // Normalize the pattern
+      const normalizedPattern = pattern.startsWith("/")
+        ? pattern.substring(1)
+        : pattern;
+
+      // Check if this path is a prefix of our target path
+      if (
+        path === normalizedPattern ||
+        path.startsWith(normalizedPattern + "/")
+      ) {
+        // Check if this is a more specific match than what we've found so far
+        if (normalizedPattern.length > longestMatchLength) {
+          longestMatchLength = normalizedPattern.length;
+          mostSpecificCodeowner = codeowner;
+        }
+      }
+    }
+  }
+
+  return mostSpecificCodeowner;
+};
+
 // Expand wildcard patterns in paths and find matching files
 const expandGlobPatterns = (
   paths: string[],
@@ -196,7 +234,12 @@ const expandGlobPatterns = (
 };
 
 // Create a tree structure from a flat list of paths with files and directories
-const buildPathTree = (paths: string[], workspacePath: string): PathNode[] => {
+const buildPathTree = (
+  paths: string[],
+  workspacePath: string,
+  codeownerPaths: Record<string, string[]>,
+  currentCodeowner: string
+): PathNode[] => {
   // Use a map to track created nodes
   const nodeMap = new Map<string, PathNode>();
   const rootNodes: PathNode[] = [];
@@ -247,6 +290,20 @@ const buildPathTree = (paths: string[], workspacePath: string): PathNode[] => {
     const cleanPath = pathStr.startsWith("/") ? pathStr.substring(1) : pathStr;
     if (!cleanPath) return; // Skip empty paths
 
+    // Check if this path belongs to a more specific codeowner
+    const mostSpecificCodeowner = getMostSpecificCodeowner(
+      cleanPath,
+      codeownerPaths
+    );
+
+    // Skip this path if it belongs to a different codeowner
+    if (mostSpecificCodeowner && mostSpecificCodeowner !== currentCodeowner) {
+      logDebug(
+        `Skipping ${cleanPath} as it belongs to ${mostSpecificCodeowner}`
+      );
+      return;
+    }
+
     // First create all directory nodes for this path
     const segments = cleanPath.split("/").filter(Boolean);
     const isPathFile = isFile(cleanPath, workspacePath);
@@ -256,6 +313,21 @@ const buildPathTree = (paths: string[], workspacePath: string): PathNode[] => {
       const currentPath = parentPath ? `${parentPath}/${segment}` : segment;
       const isLastSegment = index === segments.length - 1;
       const isFileSegment = isLastSegment && isPathFile;
+
+      // Check if this segment path belongs to a more specific codeowner
+      if (parentPath) {
+        const segmentSpecificCodeowner = getMostSpecificCodeowner(
+          currentPath,
+          codeownerPaths
+        );
+        if (
+          segmentSpecificCodeowner &&
+          segmentSpecificCodeowner !== currentCodeowner
+        ) {
+          // Don't mark this as directly owned if a more specific rule assigns it to another codeowner
+          return currentPath;
+        }
+      }
 
       // Check if the node already exists
       if (!nodeMap.has(currentPath)) {
@@ -350,7 +422,13 @@ const createCodeownerTreeDataProvider = () => {
       const codeownerPaths = getCodeownersPaths();
       const paths = codeownerPaths[codeowner] || [];
 
-      rootNodes = buildPathTree(paths, workspacePath);
+      // Pass the entire codeownerPaths object to buildPathTree for rule precedence checking
+      rootNodes = buildPathTree(
+        paths,
+        workspacePath,
+        codeownerPaths,
+        currentCodeowner
+      );
       onDidChangeTreeDataEmitter.fire(undefined);
     },
 
