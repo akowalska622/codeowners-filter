@@ -84,6 +84,20 @@ const isFile = (fullPath: string, workspacePath: string): boolean => {
   }
 };
 
+// Simple glob pattern matching function
+const matchesGlobPattern = (filePath: string, pattern: string): boolean => {
+  // Convert glob pattern to RegExp
+  // This is a simple implementation - for more complex cases, consider using a library like minimatch
+  const regexPattern = pattern
+    .replace(/\./g, "\\.")
+    .replace(/\*\*/g, "GLOBSTARPLACEHOLDER")
+    .replace(/\*/g, "[^/]*")
+    .replace(/GLOBSTARPLACEHOLDER/g, ".*");
+
+  const regex = new RegExp(`^${regexPattern}$`);
+  return regex.test(filePath);
+};
+
 // Get files in a directory (recursive option)
 const getFilesInDirectory = (
   directoryPath: string,
@@ -126,23 +140,84 @@ const getFilesInDirectory = (
   }
 };
 
+// Expand wildcard patterns in paths and find matching files
+const expandGlobPatterns = (
+  paths: string[],
+  workspacePath: string
+): string[] => {
+  const expandedPaths: string[] = [];
+  const processedPatterns: string[] = [];
+
+  for (const pathPattern of paths) {
+    // Normalize the path (remove leading slash)
+    const normalizedPath = pathPattern.startsWith("/")
+      ? pathPattern.substring(1)
+      : pathPattern;
+
+    // Check if this path contains a wildcard pattern
+    if (normalizedPath.includes("*")) {
+      logDebug(`Found wildcard pattern: ${normalizedPath}`);
+      processedPatterns.push(normalizedPath);
+
+      // Get the directory part of the path (everything before the last slash)
+      const lastSlashIndex = normalizedPath.lastIndexOf("/");
+      let dirPath = "";
+      let filePattern = normalizedPath;
+
+      if (lastSlashIndex !== -1) {
+        dirPath = normalizedPath.substring(0, lastSlashIndex);
+        filePattern = normalizedPath.substring(lastSlashIndex + 1);
+      }
+
+      // Get all files from this directory (recursively if pattern includes **)
+      const shouldRecurse = normalizedPath.includes("**");
+      const baseDir = dirPath || ".";
+      const files = getFilesInDirectory(baseDir, workspacePath, shouldRecurse);
+
+      // Filter files that match the pattern
+      for (const file of files) {
+        if (matchesGlobPattern(file, normalizedPath)) {
+          expandedPaths.push(file);
+        }
+      }
+
+      // Also add the directory itself as it's directly owned
+      if (dirPath) {
+        expandedPaths.push(dirPath);
+      }
+    } else {
+      // No wildcard, add as is
+      expandedPaths.push(normalizedPath);
+    }
+  }
+
+  // Return unique paths
+  return [...new Set(expandedPaths)];
+};
+
 // Create a tree structure from a flat list of paths with files and directories
 const buildPathTree = (paths: string[], workspacePath: string): PathNode[] => {
   // Use a map to track created nodes
   const nodeMap = new Map<string, PathNode>();
   const rootNodes: PathNode[] = [];
 
-  // Special handling for deep directories like /x-pack/solutions/security/...
-  const expandedPaths = [...paths];
+  // First, expand any glob patterns in the paths
+  const expandedPaths = expandGlobPatterns(paths, workspacePath);
+  logDebug(`Expanded paths:`, expandedPaths);
 
   // Process specific paths that may need special handling
-  paths.forEach((pathStr) => {
+  expandedPaths.forEach((pathStr) => {
+    // Skip if this path contains a wildcard (should have been expanded already)
+    if (pathStr.includes("*")) {
+      return;
+    }
+
     // Normalize the path (remove leading slash)
     const normalizedPath = pathStr.startsWith("/")
       ? pathStr.substring(1)
       : pathStr;
 
-    // Check if this is a directory path
+    // Check if this is a directory path that needs to be expanded further
     try {
       const fullPath = path.join(workspacePath, normalizedPath);
       if (fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
@@ -160,8 +235,14 @@ const buildPathTree = (paths: string[], workspacePath: string): PathNode[] => {
     }
   });
 
-  // Process all paths (original + expanded)
-  expandedPaths.forEach((pathStr) => {
+  // Process all paths (expanded from globs + directory contents)
+  const uniquePaths = [...new Set(expandedPaths)];
+  uniquePaths.forEach((pathStr) => {
+    // Skip if this path still contains a wildcard (shouldn't happen at this point)
+    if (pathStr.includes("*")) {
+      return;
+    }
+
     // Normalize the path (remove leading slash)
     const cleanPath = pathStr.startsWith("/") ? pathStr.substring(1) : pathStr;
     if (!cleanPath) return; // Skip empty paths
