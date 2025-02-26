@@ -24,7 +24,7 @@ const createTreeItem = (
 
   // Handle special case for "selectCodeownerMessage" context value
   if ((node as any).contextValue === "selectCodeownerMessage") {
-    treeItem.label = "Select a Codeowner to render a tree view";
+    treeItem.label = "Select a Codeowner to show files";
     treeItem.command = {
       command: "codeOwners.generateCodeownerTree",
       title: "Select Codeowner",
@@ -440,7 +440,7 @@ const createCodeownerTreeDataProvider = () => {
       if (!currentCodeowner) {
         // If no codeowner is selected, show a message and a button
         const messageItem = new vscode.TreeItem(
-          "Select a Codeowner to render a tree view",
+          "Select a Codeowner to show files",
           vscode.TreeItemCollapsibleState.None
         );
         messageItem.command = {

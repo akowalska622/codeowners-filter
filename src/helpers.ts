@@ -67,11 +67,21 @@ export const getListOfUniqueCodeowners = (): string[] => {
       const teams = new Set<string>();
 
       fileContent.split("\n").forEach((line) => {
-        const lineTeams = line
-          .trim()
+        let trimmedLine = line.trim();
+        if (!trimmedLine || trimmedLine.startsWith("#")) {
+          console.log("return");
+          return; // Ignore empty and comment lines
+        }
+
+        // Remove inline comments (anything after #)
+        trimmedLine = trimmedLine.split("#")[0].trim();
+
+        // Extract owners (skip the first word as it's the path)
+        const lineTeams = trimmedLine
           .split(/\s+/)
           .slice(1)
-          .filter((part) => part.startsWith("@"));
+          .map((team) => team.replace(/[^@\w/-]+$/, "").trim()) // Remove trailing punctuation
+          .filter((team) => team.startsWith("@"));
 
         lineTeams.forEach((team) => teams.add(team));
       });
