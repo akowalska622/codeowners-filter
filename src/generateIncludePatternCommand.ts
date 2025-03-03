@@ -18,18 +18,59 @@ export const generateIncludePatternCommand = vscode.commands.registerCommand(
     });
 
     if (selectedOwner) {
-      const paths = codeownersMap[selectedOwner].join(",");
-      await vscode.env.clipboard.writeText(paths);
+      const paths = codeownersMap[selectedOwner];
+
+      // Format paths for inclusion pattern
+      let includePattern: string;
+
+      if (paths.length <= 3) {
+        // For few paths, just join them with commas
+        includePattern = paths.join(",");
+      } else {
+        // For many paths, group by common directories to make it more manageable
+        includePattern = groupPathsForPattern(paths);
+      }
+
+      await vscode.env.clipboard.writeText(includePattern);
 
       vscode.window.showInformationMessage(
-        `Generated pattern (paths for "${selectedOwner}") and copied it to clipboard: ${paths}`
+        `Generated pattern for "${selectedOwner}" and copied it to clipboard`
       );
 
       vscode.commands.executeCommand("workbench.action.findInFiles", {
         query: "",
-        filesToInclude: paths,
+        filesToInclude: includePattern,
         triggerSearch: true,
       });
     }
   }
 );
+
+// Helper to group paths by common directories for better include patterns
+function groupPathsForPattern(paths: string[]): string {
+  // Group paths by directory
+  const dirGroups: Record<string, string[]> = {};
+
+  for (const filePath of paths) {
+    const dir = filePath.split("/").slice(0, -1).join("/");
+    if (!dirGroups[dir]) {
+      dirGroups[dir] = [];
+    }
+    dirGroups[dir].push(filePath);
+  }
+
+  // For directories with many files, use wildcards
+  const patterns: string[] = [];
+
+  for (const [dir, files] of Object.entries(dirGroups)) {
+    if (files.length > 3) {
+      // If most files in a directory are included, use a wildcard
+      patterns.push(`${dir}/**`);
+    } else {
+      // Otherwise, list individual files
+      patterns.push(...files);
+    }
+  }
+
+  return patterns.join(",");
+}
