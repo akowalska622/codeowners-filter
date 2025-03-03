@@ -23,10 +23,6 @@
     },
     "commands": [
       {
-        "command": "codeOwners.listCodeOwners",
-        "title": "Code Owners: List and Copy Code Owner"
-      },
-      {
         "command": "codeOwners.generateIncludePattern",
         "title": "Code Owners: Generate Include Pattern and Search"
       },
@@ -69,7 +65,6 @@
     "minimatch": "^10.0.1"
   },
   "devDependencies": {
-    "@types/minimatch": "^5.1.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
     "@types/vscode": "^1.97.0",

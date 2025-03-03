@@ -47,7 +47,7 @@ export const generateIncludePatternCommand = vscode.commands.registerCommand(
 );
 
 // Helper to group paths by common directories for better include patterns
-function groupPathsForPattern(paths: string[]): string {
+const groupPathsForPattern = (paths: string[]): string => {
   // Group paths by directory
   const dirGroups: Record<string, string[]> = {};
 
@@ -73,4 +73,4 @@ function groupPathsForPattern(paths: string[]): string {
   }
 
   return patterns.join(",");
-}
+};

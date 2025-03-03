@@ -1,3 +1,7 @@
+/**
+ * First test function, just to parse Codeowners file. Not used anymore, leaving for debugging purpose.
+ *
+ */
 import * as vscode from "vscode";
 
 import { getListOfUniqueCodeowners } from "./helpers";
