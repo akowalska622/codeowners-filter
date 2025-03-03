@@ -3,7 +3,6 @@ import * as fs from "fs";
 import * as path from "path";
 import { getCodeownersPaths, getListOfUniqueCodeowners } from "./helpers";
 
-// Define types for our tree structure
 type PathNode = {
   label: string;
   fullPath: string;
@@ -12,7 +11,6 @@ type PathNode = {
   children: PathNode[];
 };
 
-// Create TreeItem from PathNode
 const createTreeItem = (
   node: PathNode,
   workspacePath: string
@@ -22,7 +20,6 @@ const createTreeItem = (
     vscode.TreeItemCollapsibleState.None
   );
 
-  // Handle special case for "selectCodeownerMessage" context value
   if ((node as any).contextValue === "selectCodeownerMessage") {
     treeItem.label = "Select a Codeowner to show files";
     treeItem.command = {
@@ -38,7 +35,6 @@ const createTreeItem = (
       ? vscode.TreeItemCollapsibleState.Collapsed
       : vscode.TreeItemCollapsibleState.None;
 
-  // Set tooltip and styling
   treeItem.tooltip = `${node.fullPath}${
     node.isDirectlyOwned ? " (directly owned)" : ""
   }`;
@@ -51,7 +47,6 @@ const createTreeItem = (
     ? "ownedFolder"
     : "folder";
 
-  // Handle files and directories
   if (node.isFile) {
     const filePath = path.join(workspacePath, node.fullPath);
     treeItem.resourceUri = vscode.Uri.file(filePath);
@@ -68,26 +63,20 @@ const createTreeItem = (
   return treeItem;
 };
 
-// Log function for debugging
 const logDebug = (message: string, data?: any) => {
   console.log(`[CODEOWNERS DEBUG] ${message}`, data || "");
 };
 
-// Check if a path exists and is a file
 const isFile = (fullPath: string, workspacePath: string): boolean => {
   try {
     const stats = fs.statSync(path.join(workspacePath, fullPath));
     return stats.isFile();
   } catch (error) {
-    // Path doesn't exist or can't be accessed
     return false;
   }
 };
 
-// Simple glob pattern matching function
 const matchesGlobPattern = (filePath: string, pattern: string): boolean => {
-  // Convert glob pattern to RegExp
-  // This is a simple implementation - for more complex cases, consider using a library like minimatch
   const regexPattern = pattern
     .replace(/\./g, "\\.")
     .replace(/\*\*/g, "GLOBSTARPLACEHOLDER")
@@ -151,7 +140,7 @@ const getMostSpecificCodeowner = (
   // Go through all codeowners and their paths
   for (const [codeowner, paths] of Object.entries(codeownerPaths)) {
     for (const pattern of paths) {
-      // Skip if the pattern contains wildcards - we'll handle those separately
+      // Skip if the pattern contains wildcards
       if (pattern.includes("*")) {
         continue;
       }
@@ -233,29 +222,23 @@ const expandGlobPatterns = (
   return [...new Set(expandedPaths)];
 };
 
-// Create a tree structure from a flat list of paths with files and directories
 const buildPathTree = (
   paths: string[],
   workspacePath: string,
   codeownerPaths: Record<string, string[]>,
   currentCodeowner: string
 ): PathNode[] => {
-  // Use a map to track created nodes
   const nodeMap = new Map<string, PathNode>();
   const rootNodes: PathNode[] = [];
 
-  // First, expand any glob patterns in the paths
   const expandedPaths = expandGlobPatterns(paths, workspacePath);
   logDebug(`Expanded paths:`, expandedPaths);
 
-  // Process specific paths that may need special handling
   expandedPaths.forEach((pathStr) => {
-    // Skip if this path contains a wildcard (should have been expanded already)
     if (pathStr.includes("*")) {
       return;
     }
 
-    // Normalize the path (remove leading slash)
     const normalizedPath = pathStr.startsWith("/")
       ? pathStr.substring(1)
       : pathStr;
