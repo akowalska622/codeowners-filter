@@ -3,7 +3,7 @@
   "displayName": "CODEOWNERS Filter",
   "description": "Filters files in the tree view and search based on the CODEOWNERS file.",
   "version": "0.0.1",
-  "publisher": "Ania Kowalska",
+  "publisher": "AniaKowalska",
   "engines": {
     "vscode": "^1.97.0"
   },
