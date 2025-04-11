@@ -152,4 +152,4 @@ This project is licensed under the MIT License.
 
 ## 👤 Author
 
-Anna Kowalska
+[Ania Kowalska](https://github.com/akowalska622/)
