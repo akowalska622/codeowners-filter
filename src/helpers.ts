@@ -98,7 +98,9 @@ function calculateEffectivePatterns(
 
     // Find the entry for this pattern
     const patternEntry = allEntries.find((e) => e.pattern === pattern);
-    if (!patternEntry) continue;
+    if (!patternEntry) {
+      continue;
+    }
 
     // Check if this pattern is overridden by a more specific one in another entry
     for (const entry of allEntries) {

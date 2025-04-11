@@ -271,7 +271,9 @@ const buildPathTree = (
 
     // Normalize the path (remove leading slash)
     const cleanPath = pathStr.startsWith("/") ? pathStr.substring(1) : pathStr;
-    if (!cleanPath) return; // Skip empty paths
+    if (!cleanPath) {
+      return;
+    } // Skip empty paths
 
     // Check if this path belongs to a more specific codeowner
     const mostSpecificCodeowner = getMostSpecificCodeowner(
@@ -353,8 +355,12 @@ const buildPathTree = (
   for (const node of nodeMap.values()) {
     node.children.sort((a, b) => {
       // First sort by type: directories before files
-      if (!a.isFile && b.isFile) return -1;
-      if (a.isFile && !b.isFile) return 1;
+      if (!a.isFile && b.isFile) {
+        return -1;
+      }
+      if (a.isFile && !b.isFile) {
+        return 1;
+      }
 
       // Then sort alphabetically
       return a.label.localeCompare(b.label);
@@ -363,8 +369,12 @@ const buildPathTree = (
 
   // Sort root nodes the same way
   rootNodes.sort((a, b) => {
-    if (!a.isFile && b.isFile) return -1;
-    if (a.isFile && !b.isFile) return 1;
+    if (!a.isFile && b.isFile) {
+      return -1;
+    }
+    if (a.isFile && !b.isFile) {
+      return 1;
+    }
     return a.label.localeCompare(b.label);
   });
 
