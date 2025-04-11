@@ -18,7 +18,9 @@
 
 ## 📦 Installation
 
-Since this extension is currently for internal use only, you'll need to install it locally:
+Since this extension is currently for internal use only, you'll need to install it locally or download `.vsix` file built by me.
+
+### Option 1: Build locally
 
 1. (Optional, if not installed already) Install `vsce` CLI:
 
@@ -33,7 +35,7 @@ Since this extension is currently for internal use only, you'll need to install 
    cd codeowners-filter
    ```
 
-3. Install dependencies and build (optional, `vsce` should take care of that):
+3. Install dependencies and build (optionally, `vsce` should take care of that):
 
    ```bash
    npm install
@@ -55,6 +57,15 @@ Since this extension is currently for internal use only, you'll need to install 
    - Choose the `.vsix` file you just created
    - Reload VS Code when prompted
 
+### Option 2: Download and Install VSIX
+
+1. Download the latest `.vsix` file from [GitHub Releases](https://github.com/akowalska622/codeowners-filter/releases)
+2. Open VS Code
+3. Press `Cmd+Shift+P` to open the Command Palette
+4. Type "Install from VSIX" and select it
+5. Choose the downloaded `.vsix` file
+6. Reload VS Code
+
 &nbsp;
 
 > 💡 **Coming Soon**: Once published, you'll be able to install directly from the VS Code Marketplace:
@@ -70,8 +81,10 @@ Since this extension is currently for internal use only, you'll need to install 
 ### View Files by Owner
 
 1. Open the **Codeowner Files** view in the Explorer sidebar
-2. Click the 👥 icon in the view header to select a code owner
-3. Browse the tree view to see all files owned by that team/person
+2. Click the 👥 icon in the view header to select a code owner (you can find it in the Explorer sidebar, at the bottom after Source Control and Search sections)
+   ![Explorer View showing Codeowner Files location](img/explorer-view.png)
+3. Alternatively open the Command Pallette (`Ctrl+Shift+P` or `Cmd+Shift+P`) and run `Code Owners: Select Codeowner`
+4. Browse the tree view to see all files owned by that team/person
 
 ### Generate Include Patterns
 
@@ -125,7 +138,11 @@ Feel free to:
    - Add exclude patterns alongside include patterns
    - Support for combining multiple owners
 
-4. 🚀 **Future Ideas**
+4. ✨ **UX brushes**
+
+   - Add loading indicator for rendering tree view (it may take some time for larger repositories)
+
+5. 🚀 **Future Ideas**
    - Statistics dashboard showing ownership distribution
    - Your suggestions!
 
