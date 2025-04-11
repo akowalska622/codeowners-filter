@@ -20,30 +20,35 @@
 
 Since this extension is currently for internal use only, you'll need to install it locally:
 
-1. Clone this repository:
+1. (Optional, if not installed already) Install `vsce` CLI:
+
+   ```bash
+   npm install -g @vscode/vsce
+   ```
+
+2. Clone this repository:
 
    ```bash
    git clone https://github.com/akowalska622/codeowners-filter
    cd codeowners-filter
    ```
 
-2. Install dependencies and build:
+3. Install dependencies and build (optional, `vsce` should take care of that):
 
    ```bash
    npm install
-   npm run build
+   npm run compile
    ```
 
-3. Package the extension:
+4. Package the extension:
 
    ```bash
-   npm install -g @vscode/vsce
    vsce package
    ```
 
    This will create a `.vsix` file in your project directory.
 
-4. Install in VS Code:
+5. Install in VS Code:
    - Open VS Code
    - Press `Cmd+Shift+P` to open the Command Palette
    - Type "Install from VSIX" and select it

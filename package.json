@@ -10,6 +10,10 @@
   "categories": [
     "Other"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akowalska622/codeowners-filter"
+  },
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
@@ -74,5 +78,6 @@
     "@vscode/test-electron": "^2.4.1",
     "eslint": "^9.19.0",
     "typescript": "^5.7.3"
-  }
+  },
+  "license": "MIT"
 }
