@@ -1,71 +1,133 @@
-# codeowners-filter README
+# 📂 CodeOwners Filter
 
-This is the README for your extension "codeowners-filter". After writing up a brief description, we recommend including the following sections.
+**CodeOwners Filter** is a Visual Studio Code extension that gives you a visual representation of the `CODEOWNERS` file and helps you generate glob include patterns for any code owner. Whether you're maintaining a large monorepo or just want to quickly see who owns what, this tool simplifies code ownership visibility and automation.
 
-## Features
+## 🚀 Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- 🌳 **Tree View of Code Owners**  
+  See all owners and their files in a collapsible tree grouped by owner.
 
-For example if there is an image subfolder under your extension project workspace:
+- ✂️ **Generate Include Patterns**  
+  Easily generate glob patterns to include all files owned by a specific owner — perfect for use in GitHub Actions, linters, or other automation tools.
 
-\!\[feature X\]\(images/feature-x.png\)
+- 📂 **Pattern-Aware File Matching**  
+  Supports all common CODEOWNERS glob syntax, including `*`, `**`, `/`, and file extensions.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- 🔄 **Live Updates**  
+  Automatically re-parses the CODEOWNERS file when it changes.
 
-## Requirements
+## 📦 Installation
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Since this extension is currently for internal use only, you'll need to install it locally:
 
-## Extension Settings
+1. Clone this repository:
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+   ```bash
+   git clone https://github.com/akowalska622/codeowners-filter
+   cd codeowners-filter
+   ```
 
-For example:
+2. Install dependencies and build:
 
-This extension contributes the following settings:
+   ```bash
+   npm install
+   npm run build
+   ```
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+3. Package the extension:
 
-## Known Issues
+   ```bash
+   npm install -g @vscode/vsce
+   vsce package
+   ```
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+   This will create a `.vsix` file in your project directory.
 
-## Release Notes
+4. Install in VS Code:
+   - Open VS Code
+   - Press `Cmd+Shift+P` to open the Command Palette
+   - Type "Install from VSIX" and select it
+   - Choose the `.vsix` file you just created
+   - Reload VS Code when prompted
 
-Users appreciate release notes as you update your extension.
+&nbsp;
 
-### 1.0.0
+> 💡 **Coming Soon**: Once published, you'll be able to install directly from the VS Code Marketplace:
+>
+> 1. Open VS Code
+> 2. Go to the Extensions panel (`Cmd+Shift+X`)
+> 3. Search for `CodeOwners Filter`
+> 4. Click **Install**
+> 5. Reload VS Code
 
-Initial release of ...
+## 🎯 Usage
 
-### 1.0.1
+### View Files by Owner
 
-Fixed issue #.
+1. Open the **Codeowner Files** view in the Explorer sidebar
+2. Click the 👥 icon in the view header to select a code owner
+3. Browse the tree view to see all files owned by that team/person
 
-### 1.1.0
+### Generate Include Patterns
 
-Added features X, Y, and Z.
+1. Open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
+2. Run `Code Owners: Generate Include Pattern and Search`
+3. Select a code owner from the list
+4. The pattern will be copied to your clipboard and a search will open with the files
 
----
+### Refresh Tree View
 
-## Following extension guidelines
+- Click the 🔄 icon in the view header
+- The tree will update to reflect any changes in the CODEOWNERS file
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+## 🛠️ Commands
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+- `codeOwners.generateCodeownerTree`: Select a code owner to view their files in the tree
+- `codeOwners.generateIncludePattern`: Generate a glob pattern for files owned by a team
+- `codeOwners.refreshTreeView`: Refresh the tree view
 
-## Working with Markdown
+## ⚙️ Requirements
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+- VS Code 1.97.0 or newer
+- A `.github/CODEOWNERS` file in your workspace
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+## 🤝 Contributing
 
-## For more information
+Feel free to:
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-**Enjoy!**
+## 🗺️ Roadmap
+
+### Upcoming Features
+
+1. 🖱️ **Context menu**
+
+   - Context menu for tree view, similar to the native one
+
+2. 🎯 **Enhanced Pattern Matching**
+
+   - Migrate to `minimatch` for more reliable glob pattern handling
+   - Support for negative patterns (e.g., `!exclude/this/**`)
+   - Improved performance for large codebases
+
+3. ✂️ **Advanced Filtering**
+
+   - Add exclude patterns alongside include patterns
+   - Support for combining multiple owners
+
+4. 🚀 **Future Ideas**
+   - Statistics dashboard showing ownership distribution
+   - Your suggestions!
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 👤 Author
+
+Anna Kowalska
